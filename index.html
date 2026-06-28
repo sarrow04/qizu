@@ -3,222 +3,268 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Python Data Analysis Quiz</title>
+<title>Python Data Quiz</title>
 <style>
+  /* インスタグラムの縦長投稿(4:5)を想定したリセットと背景 */
   body {
     font-family: 'Helvetica Neue', Arial, sans-serif;
-    background-color: #f4f7f6;
-    color: #333;
-    line-height: 1.6;
-    padding: 20px;
+    background-color: #e2e8f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
     margin: 0;
   }
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  
+  /* スマホ画面サイズの固定コンテナ（ここでスクショを撮る） */
+  .app-container {
+    width: 400px;
+    height: 500px;
+    background: #ffffff;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    border-radius: 24px;
+    padding: 30px 25px;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
-  h1 {
-    font-size: 1.4rem;
-    text-align: center;
-    color: #2c3e50;
-    border-bottom: 2px solid #34495e;
+
+  /* 上部のステータスバー風デザイン */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f1f5f9;
     padding-bottom: 15px;
     margin-bottom: 20px;
   }
-  .level-badge {
-    display: inline-block;
-    background: #34495e;
-    color: #fff;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 0.85rem;
-    font-weight: bold;
-    margin-bottom: 15px;
-  }
-  .question {
+  
+  .app-title {
     font-size: 1.1rem;
-    margin-bottom: 25px;
+    font-weight: 800;
+    color: #0f172a;
+    margin: 0;
+  }
+
+  .level-badge {
+    background: #2563eb;
+    color: #ffffff;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.9rem;
     font-weight: bold;
   }
+
+  /* 問題文（大きく目立たせる） */
+  .question {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 25px;
+    line-height: 1.5;
+  }
+
+  /* 選択肢ボタン */
   .options {
     display: flex;
     flex-direction: column;
     gap: 12px;
   }
+
   .option-btn {
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    background: #fafafa;
+    padding: 16px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 12px;
     text-align: left;
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #334155;
     transition: all 0.2s ease;
   }
-  .option-btn:hover {
-    background: #eef2f5;
-    border-color: #bdc3c7;
-  }
+
   .option-btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.8;
+    cursor: default;
   }
-  .result {
-    margin-top: 25px;
-    padding: 20px;
-    border-radius: 4px;
+
+  /* 結果表示エリア */
+  .result-area {
     display: none;
+    flex-grow: 1;
+    overflow-y: auto;
+    animation: fadeIn 0.3s ease-in;
   }
-  .result.correct {
-    background: #e8f6ef;
-    border: 1px solid #a8dfc2;
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
-  .result.incorrect {
-    background: #faeaea;
-    border: 1px solid #f0b9b9;
+
+  .result-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 10px 0;
   }
-  .result h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-  }
-  .code-block {
-    background: #282c34;
-    color: #abb2bf;
-    padding: 15px;
-    border-radius: 4px;
-    overflow-x: auto;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 0.95rem;
-    margin: 15px 0;
-  }
-  .next-btn {
-    margin-top: 25px;
-    padding: 12px 20px;
-    background: #3498db;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
-    font-size: 1rem;
+
+  .correct-text { color: #16a34a; }
+  .incorrect-text { color: #dc2626; }
+
+  .answer-text {
+    font-size: 1.2rem;
     font-weight: bold;
-    display: none;
-    transition: background 0.2s;
+    background: #f1f5f9;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
   }
-  .next-btn:hover {
-    background: #2980b9;
+
+  .code-block {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.95rem;
+    margin-bottom: 15px;
+    overflow-x: auto;
+  }
+
+  .explanation {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: #475569;
+  }
+
+  /* 画面下部の次へボタン */
+  .next-btn {
+    margin-top: auto;
+    padding: 16px;
+    background: #0f172a;
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    width: 100%;
+    display: none;
   }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Python Data Analysis Quiz</h1>
-  <div id="quiz-container">
-    <p>データベースから問題を読み込み中...</p>
+<div class="app-container">
+  <div class="header">
+    <h1 class="app-title">Python Quiz</h1>
+    <span id="level-display" class="level-badge">読込中</span>
   </div>
+  
+  <div id="question-area">
+    <div id="question-text" class="question">データベースから問題を読み込み中...</div>
+    <div id="options-container" class="options"></div>
+  </div>
+
+  <div id="result-area" class="result-area">
+    <h2 id="result-title" class="result-title"></h2>
+    <div id="answer-text" class="answer-text"></div>
+    <div id="code-container"></div>
+    <div id="explanation-text" class="explanation"></div>
+  </div>
+
+  <button id="next-btn" class="next-btn" onclick="nextQuestion()">次の問題へ</button>
 </div>
 
 <script>
-  // GASのAPIエンドポイントURL
+  // GASのAPIエンドポイントURL（ご自身のものに置き換えてください）
   const API_URL = "https://script.google.com/macros/s/AKfycbwInQFarpndFt71e3kL7xpNvdKvvO94xbCcwt7uRFLmPpxvTRZqcZiqPMO2kw7Ub-Q0iA/exec";
   
   let quizData = [];
   let currentIndex = 0;
 
-  // アプリ起動時にデータを取得
   async function loadQuiz() {
     try {
       const response = await fetch(API_URL);
       quizData = await response.json();
-      
       if (quizData.length > 0) {
         showQuestion();
-      } else {
-        document.getElementById('quiz-container').innerHTML = "<p>スプレッドシートにデータが見つかりません。</p>";
       }
     } catch (error) {
-      document.getElementById('quiz-container').innerHTML = "<p>データの読み込みに失敗しました。</p>";
-      console.error("Error fetching data:", error);
+      document.getElementById('question-text').innerText = "通信エラーが発生しました。";
     }
   }
 
-  // 問題を画面に描画
   function showQuestion() {
     const q = quizData[currentIndex];
-    const container = document.getElementById('quiz-container');
     
-    // スプレッドシートの値が空の場合の対策
-    const optionA = q.option_a || "";
-    const optionB = q.option_b || "";
-    const optionC = q.option_c || "";
-    const optionD = q.option_d || "";
-
-    const html = `
-      <span class="level-badge">${q.level}</span>
-      <div class="question">Q. ${q.question}</div>
-      <div class="options">
-        <button class="option-btn" onclick="checkAnswer('A')">A. ${optionA}</button>
-        <button class="option-btn" onclick="checkAnswer('B')">B. ${optionB}</button>
-        <button class="option-btn" onclick="checkAnswer('C')">C. ${optionC}</button>
-        <button class="option-btn" onclick="checkAnswer('D')">D. ${optionD}</button>
-      </div>
-      <div id="result-area" class="result"></div>
-      <button id="next-btn" class="next-btn" onclick="nextQuestion()">次の問題へ</button>
+    // 表示リセット
+    document.getElementById('question-area').style.display = 'block';
+    document.getElementById('result-area').style.display = 'none';
+    document.getElementById('next-btn').style.display = 'none';
+    
+    document.getElementById('level-display').innerText = q.level;
+    document.getElementById('question-text').innerText = `Q. ${q.question}`;
+    
+    const optionsHtml = `
+      <button class="option-btn" onclick="checkAnswer('A')">A. ${q.option_a}</button>
+      <button class="option-btn" onclick="checkAnswer('B')">B. ${q.option_b}</button>
+      <button class="option-btn" onclick="checkAnswer('C')">C. ${q.option_c}</button>
+      <button class="option-btn" onclick="checkAnswer('D')">D. ${q.option_d}</button>
     `;
-    container.innerHTML = html;
+    document.getElementById('options-container').innerHTML = optionsHtml;
   }
 
-  // 解答を判定して結果と解説を表示
   function checkAnswer(selected) {
     const q = quizData[currentIndex];
+    
+    // 画面切り替え
+    document.getElementById('question-area').style.display = 'none';
     const resultArea = document.getElementById('result-area');
-    const nextBtn = document.getElementById('next-btn');
-    const options = document.querySelectorAll('.option-btn');
-    
-    // 選択後はボタンを無効化
-    options.forEach(btn => btn.disabled = true);
-
-    const isCorrect = (selected === q.answer);
-    resultArea.className = isCorrect ? 'result correct' : 'result incorrect';
-    
-    let resultHtml = `<h3>${isCorrect ? '正解！' : '不正解...'}</h3>`;
-    resultHtml += `<p>正解は <strong>${q.answer}</strong> です。</p>`;
-    
-    if (q.code) {
-      resultHtml += `<pre class="code-block"><code>${q.code}</code></pre>`;
-    }
-    if (q.explanation) {
-      resultHtml += `<p>${q.explanation}</p>`;
-    }
-    
-    resultArea.innerHTML = resultHtml;
     resultArea.style.display = 'block';
     
-    // 最後の問題かどうかでボタンの表示を変える
-    if (currentIndex < quizData.length - 1) {
-      nextBtn.style.display = 'block';
+    const isCorrect = (selected === q.answer);
+    const titleEl = document.getElementById('result-title');
+    
+    if (isCorrect) {
+      titleEl.innerText = "正解！";
+      titleEl.className = "result-title correct-text";
     } else {
+      titleEl.innerText = "不正解...";
+      titleEl.className = "result-title incorrect-text";
+    }
+    
+    document.getElementById('answer-text').innerText = `正解: ${q.answer}`;
+    
+    const codeContainer = document.getElementById('code-container');
+    if (q.code) {
+      codeContainer.innerHTML = `<div class="code-block">${q.code}</div>`;
+    } else {
+      codeContainer.innerHTML = "";
+    }
+    
+    document.getElementById('explanation-text').innerText = q.explanation;
+    
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.style.display = 'block';
+    
+    if (currentIndex >= quizData.length - 1) {
       nextBtn.innerText = '最初からやり直す';
       nextBtn.onclick = () => {
         currentIndex = 0;
         showQuestion();
       };
-      nextBtn.style.display = 'block';
+    } else {
+      nextBtn.innerText = '次の問題へ';
+      nextBtn.onclick = nextQuestion;
     }
   }
 
-  // 次の問題へ進む
   function nextQuestion() {
     currentIndex++;
     showQuestion();
   }
 
-  // 起動処理の実行
   loadQuiz();
 </script>
 
