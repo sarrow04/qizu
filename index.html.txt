@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Data Analysis Quiz</title>
+<style>
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+    margin: 0;
+  }
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+  h1 {
+    font-size: 1.4rem;
+    text-align: center;
+    color: #2c3e50;
+    border-bottom: 2px solid #34495e;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  .level-badge {
+    display: inline-block;
+    background: #34495e;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+  }
+  .question {
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    font-weight: bold;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .option-btn {
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    background: #fafafa;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+  }
+  .option-btn:hover {
+    background: #eef2f5;
+    border-color: #bdc3c7;
+  }
+  .option-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+  }
+  .result {
+    margin-top: 25px;
+    padding: 20px;
+    border-radius: 4px;
+    display: none;
+  }
+  .result.correct {
+    background: #e8f6ef;
+    border: 1px solid #a8dfc2;
+  }
+  .result.incorrect {
+    background: #faeaea;
+    border: 1px solid #f0b9b9;
+  }
+  .result h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+  }
+  .code-block {
+    background: #282c34;
+    color: #abb2bf;
+    padding: 15px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.95rem;
+    margin: 15px 0;
+  }
+  .next-btn {
+    margin-top: 25px;
+    padding: 12px 20px;
+    background: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1rem;
+    font-weight: bold;
+    display: none;
+    transition: background 0.2s;
+  }
+  .next-btn:hover {
+    background: #2980b9;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Python Data Analysis Quiz</h1>
+  <div id="quiz-container">
+    <p>データベースから問題を読み込み中...</p>
+  </div>
+</div>
+
+<script>
+  // GASのAPIエンドポイントURL
+  const API_URL = "https://script.google.com/macros/s/AKfycbwInQFarpndFt71e3kL7xpNvdKvvO94xbCcwt7uRFLmPpxvTRZqcZiqPMO2kw7Ub-Q0iA/exec";
+  
+  let quizData = [];
+  let currentIndex = 0;
+
+  // アプリ起動時にデータを取得
+  async function loadQuiz() {
+    try {
+      const response = await fetch(API_URL);
+      quizData = await response.json();
+      
+      if (quizData.length > 0) {
+        showQuestion();
+      } else {
+        document.getElementById('quiz-container').innerHTML = "<p>スプレッドシートにデータが見つかりません。</p>";
+      }
+    } catch (error) {
+      document.getElementById('quiz-container').innerHTML = "<p>データの読み込みに失敗しました。</p>";
+      console.error("Error fetching data:", error);
+    }
+  }
+
+  // 問題を画面に描画
+  function showQuestion() {
+    const q = quizData[currentIndex];
+    const container = document.getElementById('quiz-container');
+    
+    // スプレッドシートの値が空の場合の対策
+    const optionA = q.option_a || "";
+    const optionB = q.option_b || "";
+    const optionC = q.option_c || "";
+    const optionD = q.option_d || "";
+
+    const html = `
+      <span class="level-badge">${q.level}</span>
+      <div class="question">Q. ${q.question}</div>
+      <div class="options">
+        <button class="option-btn" onclick="checkAnswer('A')">A. ${optionA}</button>
+        <button class="option-btn" onclick="checkAnswer('B')">B. ${optionB}</button>
+        <button class="option-btn" onclick="checkAnswer('C')">C. ${optionC}</button>
+        <button class="option-btn" onclick="checkAnswer('D')">D. ${optionD}</button>
+      </div>
+      <div id="result-area" class="result"></div>
+      <button id="next-btn" class="next-btn" onclick="nextQuestion()">次の問題へ</button>
+    `;
+    container.innerHTML = html;
+  }
+
+  // 解答を判定して結果と解説を表示
+  function checkAnswer(selected) {
+    const q = quizData[currentIndex];
+    const resultArea = document.getElementById('result-area');
+    const nextBtn = document.getElementById('next-btn');
+    const options = document.querySelectorAll('.option-btn');
+    
+    // 選択後はボタンを無効化
+    options.forEach(btn => btn.disabled = true);
+
+    const isCorrect = (selected === q.answer);
+    resultArea.className = isCorrect ? 'result correct' : 'result incorrect';
+    
+    let resultHtml = `<h3>${isCorrect ? '正解！' : '不正解...'}</h3>`;
+    resultHtml += `<p>正解は <strong>${q.answer}</strong> です。</p>`;
+    
+    if (q.code) {
+      resultHtml += `<pre class="code-block"><code>${q.code}</code></pre>`;
+    }
+    if (q.explanation) {
+      resultHtml += `<p>${q.explanation}</p>`;
+    }
+    
+    resultArea.innerHTML = resultHtml;
+    resultArea.style.display = 'block';
+    
+    // 最後の問題かどうかでボタンの表示を変える
+    if (currentIndex < quizData.length - 1) {
+      nextBtn.style.display = 'block';
+    } else {
+      nextBtn.innerText = '最初からやり直す';
+      nextBtn.onclick = () => {
+        currentIndex = 0;
+        showQuestion();
+      };
+      nextBtn.style.display = 'block';
+    }
+  }
+
+  // 次の問題へ進む
+  function nextQuestion() {
+    currentIndex++;
+    showQuestion();
+  }
+
+  // 起動処理の実行
+  loadQuiz();
+</script>
+
+</body>
+</html>
